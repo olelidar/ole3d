@@ -110,12 +110,12 @@ namespace ole_pointcloud
     for (size_t i = 0; i < scanMsg->packets.size()-1; ++i)
     {
       container_ptr->computeTransformation(scanMsg->packets[i].stamp);
-      data_->unpack(scanMsg->packets[i], *container_ptr,i);
+      data_->unpack(scanMsg->packets[i], *container_ptr,i,scanMsg->header.stamp);
     } 
     // last packet
     size_t i = scanMsg->packets.size()-1;
     container_ptr->computeTransformation(scanMsg->packets[i].stamp);
-    data_->unpack(scanMsg->packets[i], *container_ptr,1000);
+    data_->unpack(scanMsg->packets[i], *container_ptr,1000,scanMsg->header.stamp);
 
     // publish the accumulated cloud message
     output_.publish(container_ptr->finishCloud());

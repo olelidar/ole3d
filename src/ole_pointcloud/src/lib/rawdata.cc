@@ -113,7 +113,7 @@ namespace ole_rawdata
     return 0;
   }
 
-  void RawData::unpack(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet)
+  void RawData::unpack(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet,const ros::Time& scan_start_time)
   {
     using ole_pointcloud::LaserCorrection;
     ROS_DEBUG_STREAM("Received packet, time: " << pkt.stamp);
@@ -121,7 +121,7 @@ namespace ole_rawdata
     /** special parsing for the VLP16 **/
     if (calibration_.num_lasers == 16)
     {
-      unpack_LR16F(pkt, data, sn_packet);
+      unpack_LR16F(pkt, data, sn_packet,scan_start_time);
       return;
     }
 
@@ -129,7 +129,7 @@ namespace ole_rawdata
     return;
   }
 
-  void RawData::unpack_LR16F(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet)
+  void RawData::unpack_LR16F(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet,const ros::Time& scan_start_time)
   {
     //added by zyl 20191003
     int block_start = 0;
@@ -166,6 +166,7 @@ namespace ole_rawdata
 
     //
     const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
+    float time_diff_start_to_this_packet = (pkt.stamp - scan_start_time).toSec();
     union two_bytes tmp;
 
     if (sn_packet == 0)
@@ -264,7 +265,8 @@ namespace ole_rawdata
         // x = int(x * 1000) / 1000.0f;
         //y = int(y * 1000) / 1000.0f;
         //z = int(z * 1000) / 1000.0f;
-        data.addPoint(y, -x, z, (int)TABLE_COMP[ch][4], alpha, deepth, intensity);
+        double Treal = time_diff_start_to_this_packet + ((51*(block*2))+(3*ch))/1000000000.0;
+        data.addPoint(y, -x, z, (int)TABLE_COMP[ch][4], alpha, deepth, intensity,Treal);
         pos_base += 3;
       }
       data.newLine();
@@ -308,7 +310,9 @@ namespace ole_rawdata
         //x = int(x * 1000) / 1000.0f;
         //y = int(y * 1000) / 1000.0f;
         //z = int(z * 1000) / 1000.0f;
-        data.addPoint(y, -x, z, (int)TABLE_COMP[ch][4], alpha, deepth, intensity);
+        //这里一定要是double，float的精度不够
+        double Treal = time_diff_start_to_this_packet + ((51*(block*2+1))+(3*ch))/1000000000.0;
+        data.addPoint(y, -x, z, (int)TABLE_COMP[ch][4], alpha, deepth, intensity,Treal);
         pos_base += 3;
       }
       data.newLine();

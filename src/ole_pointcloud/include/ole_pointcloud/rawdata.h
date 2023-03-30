@@ -121,7 +121,7 @@ public:
    */
   int setupOffline(std::string calibration_file, double max_range_, double min_range_);
 
-  void unpack(const ole_msgs::olePacket& pkt, DataContainerBase& data,int sn_packet);
+  void unpack(const ole_msgs::olePacket& pkt, DataContainerBase& data,int sn_packet,const ros::Time& scan_start_time);
 
   void setParameters(double min_range, double max_range, double view_direction, double view_width);
 
@@ -151,7 +151,7 @@ private:
   float cos_rot_table_[ROTATION_MAX_UNITS];
 
   /** add private function to handle the LR16F **/
-  void unpack_LR16F(const ole_msgs::olePacket& pkt, DataContainerBase& data, int sn_packet);
+  void unpack_LR16F(const ole_msgs::olePacket& pkt, DataContainerBase& data, int sn_packet,const ros::Time& scan_start_time);
 };
 
 }  // namespace ole_rawdata

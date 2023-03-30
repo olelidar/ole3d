@@ -114,11 +114,11 @@ namespace ole_pointcloud
     // process each packet provided by the driver
     for (size_t i = 0; i < scanMsg->packets.size() - 1; ++i)
     {
-      data_->unpack(scanMsg->packets[i], *container_ptr_, i);
+      data_->unpack(scanMsg->packets[i], *container_ptr_, i,scanMsg->header.stamp);
     }
     // the last packet
     size_t i = scanMsg->packets.size() - 1;
-    data_->unpack(scanMsg->packets[i], *container_ptr_, 1000);
+    data_->unpack(scanMsg->packets[i], *container_ptr_, 1000,scanMsg->header.stamp);
 
     // publish the accumulated cloud message
     diag_topic_->tick(scanMsg->header.stamp);

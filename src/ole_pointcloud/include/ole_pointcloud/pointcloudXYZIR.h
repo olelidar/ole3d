@@ -17,10 +17,11 @@ public:
 
   virtual void setup(const ole_msgs::oleScan::ConstPtr& scan_msg);
 
-  virtual void addPoint(float x, float y, float z, uint16_t ring, uint16_t azimuth, float distance, float intensity);
+  virtual void addPoint(float x, float y, float z, const uint16_t ring, const uint16_t azimuth, const float distance, const float intensity,const float timestamp);
 
   sensor_msgs::PointCloud2Iterator<float> iter_x, iter_y, iter_z, iter_intensity;
   sensor_msgs::PointCloud2Iterator<uint16_t> iter_ring;
+  sensor_msgs::PointCloud2Iterator<float> iter_timestamp;
 };
 }  // namespace ole_pointcloud
 
