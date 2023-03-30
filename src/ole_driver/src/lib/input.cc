@@ -101,7 +101,7 @@ namespace ole_driver
 
     // connect to ole UDP port
     ROS_INFO_STREAM("Opening UDP socket: port " << port);
-    ROS_INFO_STREAM("Version:1.0.3");
+    ROS_INFO_STREAM("Version:1.0.4");
     sockfd_ = socket(PF_INET, SOCK_DGRAM, 0);
     if (sockfd_ == -1)
       {

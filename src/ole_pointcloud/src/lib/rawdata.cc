@@ -269,7 +269,7 @@ inline float SQR(float val) { return val*val; }
       // X=R * cos(ω) * sin(α) + h_off * cos(α)
       // Y=R * cos(ω) * cos(α) - h_off * sin(α)
       // Z=R * sin(ω) + v_off
-
+      //取得角度
       azimuth = (float)(raw->blocks[block].rotation);
       pos_base = 0;
       for (int ch = 0; ch < 16; ch++) {
@@ -279,18 +279,20 @@ inline float SQR(float val) { return val*val; }
           tmp.bytes[1] = raw->blocks[block].data[pos_base+1];  //深度数据 高位
           if (tmp.bytes[0]==0 &&tmp.bytes[1]==0 ) //no laser beam return
             {
-              //continue;
+              continue;
             }
           deepth = tmp.uint * distance_resolution;
+          //取得反射率
           intensity = raw->blocks[block].data[pos_base+2];
           
 		  
           omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
           alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
-               
-          x=deepth * cos_rot_table_[omega] * sin_rot_table_[alpha] + TABLE_COMP[ch][2] * cos_rot_table_[alpha]; 
-          y=deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
-          z=deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
+
+             x=deepth * cos_rot_table_[omega] * sin_rot_table_[alpha] + TABLE_COMP[ch][2] * cos_rot_table_[alpha]; 
+             y=deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
+             z=deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
+
 		  
           /** Use standard ROS coordinate system (right-hand rule) */
           //float x_coord = y;
@@ -313,7 +315,7 @@ inline float SQR(float val) { return val*val; }
           tmp.bytes[1] = raw->blocks[block].data[pos_base + 1];  //depth high
           if (tmp.bytes[0]==0 &&tmp.bytes[1]==0 ) //no laser beam return
             {
-              // continue;
+               continue;
             }
 			
           deepth = tmp.uint * distance_resolution;
@@ -321,12 +323,11 @@ inline float SQR(float val) { return val*val; }
           			   
           omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
           alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
-               
-          x=deepth * cos_rot_table_[omega] * sin_rot_table_[alpha] + TABLE_COMP[ch][2] * cos_rot_table_[alpha]; 
-          y=deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
-          z=deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
-		  		  
-		  		  
+
+             x=deepth * cos_rot_table_[omega] * sin_rot_table_[alpha] + TABLE_COMP[ch][2] * cos_rot_table_[alpha]; 
+             y=deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
+             z=deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
+		  
           /** Use standard ROS coordinate system (right-hand rule) */
           //float x_coord = y;
           //float y_coord = -x;

@@ -1,8 +1,8 @@
 ## LR-16F ROS Drive and PointCloud2  ##
 
-### Version:1.0.3 ###
+### Version:1.0.4 ###
 
-1.修正光学校正系数
+1.清除距离为0的无效点
 
 #### build ####
 1. make catkin workspace at your ros machine.
