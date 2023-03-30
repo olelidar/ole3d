@@ -4,12 +4,10 @@
 namespace ole_laserscan
 {
 
-oleLaserScan::oleLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_priv) :
-    nh_(nh), srv_(nh_priv), ring_count_(0)
+oleLaserScan::oleLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_priv) : nh_(nh), srv_(nh_priv), ring_count_(0)
 {
   ros::SubscriberStatusCallback connect_cb = boost::bind(&oleLaserScan::connectCb, this);
   pub_ = nh.advertise<sensor_msgs::LaserScan>("scan", 10, connect_cb, connect_cb);
-
   srv_.setCallback(boost::bind(&oleLaserScan::reconfig, this, _1, _2));
 }
 
@@ -53,10 +51,7 @@ void oleLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     {
       const uint16_t ring = *it;
 
-      if (ring + 1 > ring_count_)
-      {
-        ring_count_ = ring + 1;
-      }
+      if (ring + 1 > ring_count_) ring_count_ = ring + 1; 
     }
     if (ring_count_)
     {

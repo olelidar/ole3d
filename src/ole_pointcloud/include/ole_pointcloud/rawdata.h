@@ -150,7 +150,6 @@ private:
   float sin_rot_table_[ROTATION_MAX_UNITS];
   float cos_rot_table_[ROTATION_MAX_UNITS];
 
-  /** add private function to handle the VLP16 **/
   /** add private function to handle the LR16F **/
   void unpack_LR16F(const ole_msgs::olePacket& pkt, DataContainerBase& data, int sn_packet);
 };

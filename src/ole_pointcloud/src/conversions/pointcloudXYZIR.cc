@@ -1,6 +1,3 @@
-
-
-
 #include <ole_pointcloud/pointcloudXYZIR.h>
 
 namespace ole_pointcloud 

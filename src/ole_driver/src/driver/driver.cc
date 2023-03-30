@@ -6,23 +6,20 @@
 #include <ole_msgs/oleScan.h>
 
 #include "ole_driver/driver.h"
-// for debug
 #include <chrono>
 
 namespace ole_driver
 {
 
-  oleDriver::oleDriver(ros::NodeHandle node,
-                       ros::NodeHandle private_nh,
-                       std::string const &node_name)
-      : diagnostics_(node, private_nh, node_name)
+  oleDriver::oleDriver(ros::NodeHandle node, ros::NodeHandle private_nh, std::string const &node_name) : diagnostics_(node, private_nh, node_name)
   {
     // use private node handle to get parameters
     private_nh.param("frame_id", config_.frame_id, std::string("ole"));
     std::string tf_prefix = tf::getPrefixParam(private_nh);
+    
     ROS_DEBUG_STREAM("tf_prefix: " << tf_prefix);
     config_.frame_id = tf::resolve(tf_prefix, config_.frame_id);
-
+    
     // get model name, validate string, determine packet rate
     private_nh.param("model", config_.model, std::string("LR16F"));
     double packet_rate; // packet frequency (Hz)
@@ -30,7 +27,6 @@ namespace ole_driver
 
     if (config_.model == "LR16F")
     {
-     
       packet_rate = 840; 
       model_full_name = "LR16F";
     }
@@ -67,9 +63,7 @@ namespace ole_driver
     }
     else if (cut_angle < (2 * M_PI))
     {
-      ROS_INFO_STREAM("Cut at specific angle feature activated. "
-                      "Cutting ole points always at "
-                      << cut_angle << " rad.");
+      ROS_INFO_STREAM("Cut at specific angle feature activated.Cutting ole points always at "<< cut_angle << " rad.");
     }
     else
     {
@@ -124,8 +118,7 @@ namespace ole_driver
     }
 
     // raw packet output topic
-    output_ =
-        node.advertise<ole_msgs::oleScan>("ole_packets", 10);
+    output_ = node.advertise<ole_msgs::oleScan>("ole_packets", 10);
 
     last_azimuth_ = -1;
 

@@ -57,4 +57,5 @@
     <arg name="ring" value="$(arg laserscan_ring)"/>
     <arg name="resolution" value="$(arg laserscan_resolution)"/>
   </include>
+<node name="rvizLocal" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find ole_pointcloud)/params/ole.rviz" required="true"/>
 </launch>

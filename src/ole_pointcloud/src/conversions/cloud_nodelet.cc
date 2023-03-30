@@ -1,17 +1,3 @@
-/*
- *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
-/** @file
-
-    This ROS nodelet converts raw ole 3D LIDAR packets to a
-    PointCloud2.
-
-*/
-
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
@@ -40,9 +26,4 @@ namespace ole_pointcloud
   }
 
 } // namespace ole_pointcloud
-
-
-// Register this plugin with pluginlib.  Names must match nodelets.xml.
-//
-// parameters: class type, base class type
 PLUGINLIB_EXPORT_CLASS(ole_pointcloud::CloudNodelet, nodelet::Nodelet)

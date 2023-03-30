@@ -1,16 +1,3 @@
-/**
- * \file  calibration.cc
- * \brief  
- *
- * \author  Piyush Khandelwal (piyushk@cs.utexas.edu)
- * Copyright (C) 2012, Austin Robot Technology,
- *                     The University of Texas at Austin
- *
- * License: Modified BSD License
- *
- * $ Id: 02/14/2012 11:36:36 AM piyushk $
- */
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -20,9 +7,6 @@
 
 #ifdef HAVE_NEW_YAMLCPP
 namespace YAML {
-
-  // The >> operator disappeared in yaml-cpp 0.5, so this function is
-  // added to provide support for code written under the yaml-cpp 0.3 API.
   template<typename T>
   void operator >> (const YAML::Node& node, T& i) {
     i = node.as<T>();
@@ -42,9 +26,8 @@ namespace ole_pointcloud
   const std::string LASER_ID = "laser_id";
   const std::string ROT_CORRECTION = "rot_correction";
   const std::string VERT_CORRECTION = "vert_correction";
-   const std::string DIST_CORRECTION = "dist_correction";
-  const std::string TWO_PT_CORRECTION_AVAILABLE =
-    "two_pt_correction_available";
+  const std::string DIST_CORRECTION = "dist_correction";
+  const std::string TWO_PT_CORRECTION_AVAILABLE = "two_pt_correction_available";
   const std::string DIST_CORRECTION_X = "dist_correction_x";
   const std::string DIST_CORRECTION_Y = "dist_correction_y";
   const std::string VERT_OFFSET_CORRECTION = "vert_offset_correction";
@@ -187,9 +170,7 @@ namespace ole_pointcloud
         // store this ring number with its corresponding laser number
         calibration.laser_corrections[next_index].laser_ring = ring;
         next_angle = min_seen;
-        if (calibration.ros_info) {
-          ROS_INFO("laser_ring[%2u] = %2u, angle = %+.6f",
-                   next_index, ring, next_angle);
+        if (calibration.ros_info) { ROS_INFO("laser_ring[%2u] = %2u, angle = %+.6f", next_index, ring, next_angle);
         }
       }
     }

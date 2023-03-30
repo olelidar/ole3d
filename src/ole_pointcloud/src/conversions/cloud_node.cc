@@ -1,16 +1,3 @@
-/*
- *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
-/** \file
-
-    This ROS node converts raw ole LIDAR packets to PointCloud2.
-
-*/
-
 #include <ros/ros.h>
 #include "ole_pointcloud/convert.h"
 

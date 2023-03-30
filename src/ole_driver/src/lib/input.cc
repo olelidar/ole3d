@@ -15,10 +15,6 @@ namespace ole_driver
   static const size_t packet_size =
       sizeof(ole_msgs::olePacket().data);
 
-  ////////////////////////////////////////////////////////////////////////
-  // Input base class implementation
-  ////////////////////////////////////////////////////////////////////////
-
   /** @brief constructor
    *
    *  @param private_nh ROS private handle for calling node.
@@ -30,8 +26,7 @@ namespace ole_driver
     private_nh.param("device_ip", devip_str_, std::string(""));
     private_nh.param("gps_time", gps_time_, false);
     if (!devip_str_.empty())
-      ROS_INFO_STREAM("Only accepting packets from IP address: "
-                      << devip_str_);
+      ROS_INFO_STREAM("Only accepting packets from IP address: " << devip_str_);
   }
 
   InputSocket::InputSocket(ros::NodeHandle private_nh, uint16_t port) : Input(private_nh, port)
@@ -39,13 +34,10 @@ namespace ole_driver
     sockfd_ = -1;
 
     if (!devip_str_.empty())
-    {
       inet_aton(devip_str_.c_str(), &devip_);
-    }
-
     // connect to ole UDP port
     ROS_INFO_STREAM("Opening UDP socket: port " << port);
-    ROS_INFO_STREAM("Version:1.0.7");
+    ROS_INFO_STREAM("Version:1.0.8");
     sockfd_ = socket(PF_INET, SOCK_DGRAM, 0);
     if (sockfd_ == -1)
     {
@@ -95,31 +87,13 @@ namespace ole_driver
 
     while (true)
     {
-      // Unfortunately, the Linux kernel recvfrom() implementation
-      // uses a non-interruptible sleep() when waiting for data,
-      // which would cause this method to hang if the device is not
-      // providing data.  We poll() the device first to make sure
-      // the recvfrom() will not block.
-      //
-      // Note, however, that there is a known Linux kernel bug:
-      //
-      //   Under Linux, select() may report a socket file descriptor
-      //   as "ready for reading", while nevertheless a subsequent
-      //   read blocks.  This could for example happen when data has
-      //   arrived but upon examination has wrong checksum and is
-      //   discarded.  There may be other circumstances in which a
-      //   file descriptor is spuriously reported as ready.  Thus it
-      //   may be safer to use O_NONBLOCK on sockets that should not
-      //   block.
-
       // poll() until input available
       do
       {
         int retval = poll(fds, 1, POLL_TIMEOUT);
         if (retval < 0) // poll() error?
         {
-          if (errno != EINTR)
-            ROS_ERROR("poll() error: %s", strerror(errno));
+          if (errno != EINTR) ROS_ERROR("poll() error: %s", strerror(errno));
           return -1;
         }
         if (retval == 0) // poll() timeout?
@@ -136,10 +110,7 @@ namespace ole_driver
 
       // Receive packets that should now be available from the
       // socket using a blocking read.
-      ssize_t nbytes = recvfrom(sockfd_, &pkt->data[0],
-                                packet_size, 0,
-                                (sockaddr *)&sender_address,
-                                &sender_address_len);
+      ssize_t nbytes = recvfrom(sockfd_, &pkt->data[0], packet_size, 0, (sockaddr *)&sender_address, &sender_address_len);
 
       if (nbytes < 0)
       {
@@ -161,8 +132,7 @@ namespace ole_driver
           break; //done
       }
 
-      ROS_DEBUG_STREAM("incomplete ole packet read: "
-                       << nbytes << " bytes");
+      ROS_DEBUG_STREAM("incomplete ole packet read: " << nbytes << " bytes");
     }
 
     if (!gps_time_)
@@ -207,13 +177,9 @@ namespace ole_driver
     private_nh.param("read_fast", read_fast_, false);
     private_nh.param("repeat_delay", repeat_delay_, 0.0);
 
-    if (read_once_)
-      ROS_INFO("Read input file only once.");
-    if (read_fast_)
-      ROS_INFO("Read input file as quickly as possible.");
-    if (repeat_delay_ > 0.0)
-      ROS_INFO("Delay %.3f seconds before repeating input file.",
-               repeat_delay_);
+    if (read_once_) ROS_INFO("Read input file only once.");
+    if (read_fast_) ROS_INFO("Read input file as quickly as possible.");
+    if (repeat_delay_ > 0.0) ROS_INFO("Delay %.3f seconds before repeating input file.", repeat_delay_);
 
     // Open the PCAP dump file
     ROS_INFO("Opening PCAP file \"%s\"", filename_.c_str());
@@ -224,13 +190,9 @@ namespace ole_driver
     }
 
     std::stringstream filter;
-    if (devip_str_ != "") // using specific IP?
-    {
-      filter << "src host " << devip_str_ << " && ";
-    }
+    if (devip_str_ != "") filter << "src host " << devip_str_ << " && "; 
     filter << "udp dst port " << port;
-    pcap_compile(pcap_, &pcap_packet_filter_,
-                 filter.str().c_str(), 1, PCAP_NETMASK_UNKNOWN);
+    pcap_compile(pcap_, &pcap_packet_filter_, filter.str().c_str(), 1, PCAP_NETMASK_UNKNOWN);
   }
 
   /** destructor */
@@ -252,13 +214,10 @@ namespace ole_driver
       {
         // Skip packets not for the correct port and from the
         // selected IP address.
-        if (0 == pcap_offline_filter(&pcap_packet_filter_,
-                                     header, pkt_data))
-          continue;
+        if (0 == pcap_offline_filter(&pcap_packet_filter_, header, pkt_data)) continue;
 
         // Keep the reader from blowing through the file.
-        if (read_fast_ == false)
-          packet_rate_.sleep();
+        if (read_fast_ == false) packet_rate_.sleep();
 
         memcpy(&pkt->data[0], pkt_data + 42, packet_size);
         pkt->stamp = ros::Time::now(); // time_offset not considered here, as no synchronization required
@@ -268,8 +227,7 @@ namespace ole_driver
 
       if (empty_) // no data in file?
       {
-        ROS_WARN("Error %d reading ole packet: %s",
-                 res, pcap_geterr(pcap_));
+        ROS_WARN("Error %d reading ole packet: %s", res, pcap_geterr(pcap_));
         return -1;
       }
 
@@ -281,8 +239,7 @@ namespace ole_driver
 
       if (repeat_delay_ > 0.0)
       {
-        ROS_INFO("end of file reached -- delaying %.3f seconds.",
-                 repeat_delay_);
+        ROS_INFO("end of file reached -- delaying %.3f seconds.", repeat_delay_);
         usleep(rint(repeat_delay_ * 1000000.0));
       }
 
@@ -294,7 +251,7 @@ namespace ole_driver
       pcap_close(pcap_);
       pcap_ = pcap_open_offline(filename_.c_str(), errbuf_);
       empty_ = true; // maybe the file disappeared?
-    }                // loop back and try again
+    } 
   }
 
 } // namespace ole_driver

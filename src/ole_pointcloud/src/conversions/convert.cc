@@ -1,31 +1,14 @@
-/*
- *  Copyright (C) 2009, 2010 Austin Robot Technology, Jack O'Quin
- *  Copyright (C) 2011 Jesse Vera
- *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
-/** @file
-
-    This class converts raw ole 3D LIDAR packets to PointCloud2.
-
-*/
-
 #include "ole_pointcloud/convert.h"
-
 #include <ole_pointcloud/pointcloudXYZIR.h>
 #include <ole_pointcloud/organized_cloudXYZIR.h>
-// for debug
 #include <chrono>
 #include <sensor_msgs/point_cloud2_iterator.h>
 
 namespace ole_pointcloud
 {
   /** @brief Constructor. */
-  Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh, std::string const &node_name) : data_(new ole_rawdata::RawData()), first_rcfg_call(true),
-                                                                                                     diagnostics_(node, private_nh, node_name)
+  Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh, std::string const &node_name)
+      : data_(new ole_rawdata::RawData()), first_rcfg_call(true), diagnostics_(node, private_nh, node_name)
   {
     //
     boost::optional<ole_pointcloud::Calibration> calibration = data_->setup(private_nh);
@@ -38,7 +21,7 @@ namespace ole_pointcloud
     {
       ROS_ERROR_STREAM("Could not load calibration file!");
     }
-
+    
     if (config_.organize_cloud)
     {
       container_ptr_ = boost::shared_ptr<OrganizedCloudXYZIR>(
@@ -55,21 +38,17 @@ namespace ole_pointcloud
     }
 
     // advertise output point cloud (before subscribing to input data)
-    output_ =
-        node.advertise<sensor_msgs::PointCloud2>("olei_points", 10);
+    output_ = node.advertise<sensor_msgs::PointCloud2>("olei_points", 10);
 
-    srv_ = boost::make_shared<dynamic_reconfigure::Server<ole_pointcloud::
-                                                              CloudNodeConfig>>(private_nh);
-    dynamic_reconfigure::Server<ole_pointcloud::CloudNodeConfig>::
-        CallbackType f;
+    srv_ = boost::make_shared<dynamic_reconfigure::Server<ole_pointcloud::CloudNodeConfig>>(private_nh);
+    dynamic_reconfigure::Server<ole_pointcloud::CloudNodeConfig>::CallbackType f;
     f = boost::bind(&Convert::callback, this, _1, _2);
     srv_->setCallback(f);
 
     // subscribe to oleScan packets
-    ole_scan_ =
-        node.subscribe("ole_packets", 10,
-                       &Convert::processScan, (Convert *)this,
-                       ros::TransportHints().tcpNoDelay(true));
+    ole_scan_ = node.subscribe("ole_packets", 10,
+                               &Convert::processScan, (Convert *)this,
+                               ros::TransportHints().tcpNoDelay(true));
 
     // Diagnostics
     diagnostics_.setHardwareID("ole Convert");
@@ -85,24 +64,20 @@ namespace ole_pointcloud
                                           TimeStampStatusParam()));
   }
 
-  void Convert::callback(ole_pointcloud::CloudNodeConfig &config,
-                         uint32_t level)
+  void Convert::callback(ole_pointcloud::CloudNodeConfig &config, uint32_t level)
   {
-    ROS_INFO("Reconfigure Request");
-    data_->setParameters(config.min_range, config.max_range, config.view_direction,
-                         config.view_width);
+    data_->setParameters(config.min_range, config.max_range, config.view_direction, config.view_width);
     config_.fixed_frame = config.fixed_frame;
     config_.target_frame = config.target_frame;
     config_.min_range = config.min_range;
     config_.max_range = config.max_range;
-
     if (first_rcfg_call || config.organize_cloud != config_.organize_cloud)
     {
       first_rcfg_call = false;
       config_.organize_cloud = config.organize_cloud;
       if (config_.organize_cloud) // TODO only on change
       {
-        ROS_INFO_STREAM("Using the organized cloud format...");
+        ROS_INFO_STREAM("Using the OrganizedCloudXYZIR format...");
         container_ptr_ = boost::shared_ptr<OrganizedCloudXYZIR>(
             new OrganizedCloudXYZIR(config_.max_range, config_.min_range,
                                     config_.target_frame, config_.fixed_frame,
@@ -110,6 +85,7 @@ namespace ole_pointcloud
       }
       else
       {
+        ROS_INFO_STREAM("Using the PointcloudXYZIR format...");
         container_ptr_ = boost::shared_ptr<PointcloudXYZIR>(
             new PointcloudXYZIR(config_.max_range, config_.min_range,
                                 config_.target_frame, config_.fixed_frame,
@@ -154,12 +130,12 @@ namespace ole_pointcloud
 
     auto t2 = std::chrono::steady_clock::now();
     double dt_us = std::chrono::duration<double, std::micro>(t2 - t1).count();
-
-    //std::cout << "processScan Start: " << std::to_string(t1_us)
-    //          << ":" << std::to_string(dt_us)
-    //          << ":" <<  std::to_string(size_packets)
-    //         << ":" <<  std::to_string(cloud.width)
-    //         << std::endl;
+   
+    // std::cout << "发送topic数据: " << std::to_string(t1_us)
+    //           << ":" << std::to_string(dt_us)
+    //           << ":" << std::to_string(size_packets)
+    //           << ":" << std::to_string(cloud.width)
+    //           << std::endl;
   }
 
 } // namespace ole_pointcloud

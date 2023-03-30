@@ -30,8 +30,7 @@ ros::Time rosTimeFromGpsTimestamp(const uint8_t * const data) {
                                   ((uint32_t) data[0] ));
     ros::Time time_nom = ros::Time::now(); // use this to recover the hour
     uint32_t cur_hour = time_nom.sec / HOUR_TO_SEC;
-    ros::Time stamp = ros::Time((cur_hour * HOUR_TO_SEC) + (usecs / 1000000),
-                                (usecs % 1000000) * 1000);
+    ros::Time stamp = ros::Time((cur_hour * HOUR_TO_SEC) + (usecs / 1000000), (usecs % 1000000) * 1000);
     stamp = resolveHourAmbiguity(stamp, time_nom);
     return stamp;
 }

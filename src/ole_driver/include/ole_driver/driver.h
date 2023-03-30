@@ -17,23 +17,19 @@ namespace ole_driver
 class oleDriver
 {
 public:
-  oleDriver(ros::NodeHandle node,
-                 ros::NodeHandle private_nh,
-                 std::string const & node_name = ros::this_node::getName());
+  oleDriver(ros::NodeHandle node, ros::NodeHandle private_nh, std::string const & node_name = ros::this_node::getName());
   ~oleDriver() {}
 
   bool poll(void);
 
 private:
   // Callback for dynamic reconfigure
-  void callback(ole_driver::oleNodeConfig &config,
-              uint32_t level);
+  void callback(ole_driver::oleNodeConfig &config, uint32_t level);
   // Callback for diagnostics update for lost communication with vlp
   void diagTimerCallback(const ros::TimerEvent&event);
 
   // Pointer to dynamic reconfigure service srv_
-  boost::shared_ptr<dynamic_reconfigure::Server<ole_driver::
-              oleNodeConfig> > srv_;
+  boost::shared_ptr<dynamic_reconfigure::Server<ole_driver::oleNodeConfig> > srv_;
 
   // configuration parameters
   struct

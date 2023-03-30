@@ -1,25 +1,4 @@
-/*
- *  Copyright (C) 2009, 2010 Austin Robot Technology, Jack O'Quin
- *  Copyright (C) 2011 Jesse Vera
- *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
-/** @file
-
-    This class transforms raw ole 3D LIDAR packets to PointCloud2
-    in the /map frame of reference.
-
-    @author Jack O'Quin
-    @author Jesse Vera
-    @author Sebastian Pütz
-
-*/
-
 #include "ole_pointcloud/transform.h"
-
 #include <ole_pointcloud/pointcloudXYZIR.h>
 #include <ole_pointcloud/organized_cloudXYZIR.h>
 
@@ -61,8 +40,7 @@ namespace ole_pointcloud
     }
 
     // advertise output point cloud (before subscribing to input data)
-    output_ =
-      node.advertise<sensor_msgs::PointCloud2>("olei_points", 10);
+    output_ = node.advertise<sensor_msgs::PointCloud2>("olei_points", 10);
 
     srv_ = boost::make_shared<dynamic_reconfigure::Server<TransformNodeCfg>> (private_nh);
     dynamic_reconfigure::Server<TransformNodeCfg>::CallbackType f;
@@ -71,8 +49,7 @@ namespace ole_pointcloud
 
     // subscribe to oleScan packets using transform filter
     ole_scan_.subscribe(node, "ole_packets", 10);
-    tf_filter_ptr_ = boost::shared_ptr<tf::MessageFilter<ole_msgs::oleScan> >(
-            new tf::MessageFilter<ole_msgs::oleScan>(ole_scan_, *tf_ptr_, config_.target_frame, 10));
+    tf_filter_ptr_ = boost::shared_ptr<tf::MessageFilter<ole_msgs::oleScan> >(new tf::MessageFilter<ole_msgs::oleScan>(ole_scan_, *tf_ptr_, config_.target_frame, 10));
     tf_filter_ptr_->registerCallback(boost::bind(&Transform::processScan, this, _1));
     private_nh.param<std::string>("fixed_frame", config_.fixed_frame, "odom");
 
@@ -83,20 +60,14 @@ namespace ole_pointcloud
     diag_min_freq_ = 2.0;
     diag_max_freq_ = 20.0;
     using namespace diagnostic_updater;
-    diag_topic_.reset(new TopicDiagnostic("olei_points", diagnostics_,
-                                          FrequencyStatusParam(&diag_min_freq_,
-                                                               &diag_max_freq_,
-                                                               0.1, 10),
-                                          TimeStampStatusParam()));
+    diag_topic_.reset(new TopicDiagnostic("olei_points", diagnostics_, FrequencyStatusParam(&diag_min_freq_, &diag_max_freq_, 0.1, 10), TimeStampStatusParam()));
 
   }
   
-  void Transform::reconfigure_callback(
-      ole_pointcloud::TransformNodeConfig &config, uint32_t level)
+  void Transform::reconfigure_callback(ole_pointcloud::TransformNodeConfig &config, uint32_t level)
   {
     ROS_INFO_STREAM("Reconfigure request.");
-    data_->setParameters(config.min_range, config.max_range,
-                         config.view_direction, config.view_width);
+    data_->setParameters(config.min_range, config.max_range, config.view_direction, config.view_width);
     config_.target_frame = tf::resolve(tf_prefix_, config.frame_id);
     ROS_INFO_STREAM("Target frame ID now: " << config_.target_frame);
     config_.min_range = config.min_range;
@@ -104,38 +75,31 @@ namespace ole_pointcloud
 
     boost::lock_guard<boost::mutex> guard(reconfigure_mtx_);
 
-    if(first_rcfg_call || config.organize_cloud != config_.organize_cloud){
+    if(first_rcfg_call || config.organize_cloud != config_.organize_cloud)
+    {
       first_rcfg_call = false;
       config_.organize_cloud = config.organize_cloud;
       if(config_.organize_cloud)
       {
         ROS_INFO_STREAM("Using the organized cloud format...");
         container_ptr = boost::shared_ptr<OrganizedCloudXYZIR>(
-            new OrganizedCloudXYZIR(config_.max_range, config_.min_range,
-                                    config_.target_frame, config_.fixed_frame,
+            new OrganizedCloudXYZIR(config_.max_range, config_.min_range, config_.target_frame, config_.fixed_frame,
                                     config_.num_lasers, data_->scansPerPacket()));
       }
       else
       {
         container_ptr = boost::shared_ptr<PointcloudXYZIR>(
-            new PointcloudXYZIR(config_.max_range, config_.min_range,
-                                config_.target_frame, config_.fixed_frame,
+            new PointcloudXYZIR(config_.max_range, config_.min_range, config_.target_frame, config_.fixed_frame,
                                 data_->scansPerPacket()));
       }
     }
     container_ptr->configure(config_.max_range, config_.min_range, config_.fixed_frame, config_.target_frame);
   }
 
-  /** @brief Callback for raw scan messages.
-   *
-   *  @pre TF message filter has already waited until the transform to
-   *       the configured @c frame_id can succeed.
-   */
   void
     Transform::processScan(const ole_msgs::oleScan::ConstPtr &scanMsg)
   {
-    if (output_.getNumSubscribers() == 0)         // no one listening?
-      return;                                     // avoid much work
+    if (output_.getNumSubscribers() == 0) return;  // avoid much work
 
     boost::lock_guard<boost::mutex> guard(reconfigure_mtx_);
 

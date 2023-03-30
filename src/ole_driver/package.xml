@@ -6,16 +6,10 @@
     ROS device driver for ole 3D LIDARs.
   </description>
   <maintainer email="king@autonomoustuff.com">Jun</maintainer>
-  <maintainer email="brice.rebsamen@gmail.com">Brice Rebsamen</maintainer>
-  <author>Jack O'Quin</author>
-  <author>Patrick Beeson</author>
-  <author>Michael Quinlan</author>
-  <author>Yaxin Liu </author>
+  <author>ole</author>
   <license>BSD</license>
 
   <url type="website">http://www.ros.org/wiki/ole_driver</url>
-  <url type="repository">https://github.com/ros-drivers/ole</url>
-  <url type="bugtracker">https://github.com/ros-drivers/ole/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 

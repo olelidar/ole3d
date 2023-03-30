@@ -1,56 +1,19 @@
-/*
- *  Copyright (C) 2007 Austin Robot Technology, Patrick Beeson
- *  Copyright (C) 2009, 2010, 2012 Austin Robot Technology, Jack O'Quin
- *
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
-/**
- *  @file
- *
- *  ole 3D LIDAR data accessor class implementation.
- *
- *  Class for unpacking raw ole LIDAR packets into useful
- *  formats.
- *
- *  Derived classes accept raw ole data for either single packets
- *  or entire rotations, and provide it in various formats for either
- *  on-line or off-line processing.
- *
- *  @author Patrick Beeson
- *  @author Jack O'Quin
- *
- *  HDL-64E S2 calibration support provided by Nick Hillier
- */
-
 #include <fstream>
 #include <math.h>
-
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <angles/angles.h>
-
 #include <ole_pointcloud/rawdata.h>
 
 namespace ole_rawdata
 {
   inline float SQR(float val) { return val * val; }
 
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // RawData base class implementation
-  //
-  ////////////////////////////////////////////////////////////////////////
 
   RawData::RawData() {}
 
   /** Update parameters: conversions and update */
-  void RawData::setParameters(double min_range,
-                              double max_range,
-                              double view_direction,
-                              double view_width)
+  void RawData::setParameters(double min_range, double max_range, double view_direction, double view_width)
   {
     config_.min_range = min_range;
     config_.max_range = max_range;
@@ -79,8 +42,7 @@ namespace ole_rawdata
   {
     if (calibration_.num_lasers == 16)
     {
-      return BLOCKS_PER_PACKET * LR16F_FIRINGS_PER_BLOCK *
-             LR16F_SCANS_PER_FIRING;
+      return BLOCKS_PER_PACKET * LR16F_FIRINGS_PER_BLOCK * LR16F_SCANS_PER_FIRING;
     }
     else
     {
@@ -98,10 +60,10 @@ namespace ole_rawdata
 
       // have to use something: grab unit test version as a default
       std::string pkgPath = ros::package::getPath("ole_pointcloud");
-      config_.calibrationFile = pkgPath + "/params/64e_utexas.yaml";
+      config_.calibrationFile = pkgPath + "/params/LR16F.yaml";
     }
 
-    ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);
+    //ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);
 
     calibration_.read(config_.calibrationFile);
     if (!calibration_.initialized)
@@ -128,13 +90,11 @@ namespace ole_rawdata
 
     config_.max_range = max_range_;
     config_.min_range = min_range_;
-    ROS_INFO_STREAM("data ranges to publish: ["
-                    << config_.min_range << ", "
-                    << config_.max_range << "]");
+    ROS_INFO_STREAM("data ranges to publish: [" << config_.min_range << ", "<< config_.max_range << "]");
 
     config_.calibrationFile = calibration_file;
 
-    ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);
+    //ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);
 
     calibration_.read(config_.calibrationFile);
     if (!calibration_.initialized)
@@ -153,11 +113,6 @@ namespace ole_rawdata
     return 0;
   }
 
-  /** @brief convert raw packet to point cloud
-   *
-   *  @param pkt raw packet to unpack
-   *  @param pc shared pointer to point cloud (points are appended)
-   */
   void RawData::unpack(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet)
   {
     using ole_pointcloud::LaserCorrection;
@@ -174,13 +129,6 @@ namespace ole_rawdata
     return;
   }
 
-  /** @brief convert raw VLP16 packet to point cloud
-   *
-   *  @param pkt raw packet to unpack
-   *  @param pc shared pointer to point cloud (points are appended)
-   */
-
-  //added by zyl 20191003 to use olei LR-16F
   void RawData::unpack_LR16F(const ole_msgs::olePacket &pkt, DataContainerBase &data, int sn_packet)
   {
     //added by zyl 20191003
@@ -260,9 +208,6 @@ namespace ole_rawdata
       // here monitor the end azmith
       uint16_t azi_end;
       azi_end = raw->blocks[block_end - 1].rotation;
-      //std::cout << "rawdata az end: " << std::to_string(block_end-1)
-      //          << ":" <<  std::to_string(azi_end)
-      //          << std::endl;
     }
     else
     {
@@ -291,10 +236,11 @@ namespace ole_rawdata
         deepth = tmp.uint * distance_resolution;
         //取得反射率
         intensity = raw->blocks[block].data[pos_base + 2];
-        //水平角
-        omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
         //垂直角
+        omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
+        //水平角
         alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
+
 
         if (deepth < config_.min_range)
         {
@@ -310,7 +256,7 @@ namespace ole_rawdata
           y = deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
           z = deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
         }
-
+        
         /** Use standard ROS coordinate system (right-hand rule) */
         //float x_coord = y;
         //float y_coord = -x;
@@ -335,9 +281,9 @@ namespace ole_rawdata
         deepth = tmp.uint * distance_resolution;
         //反射率
         intensity = raw->blocks[block].data[pos_base + 2];
-        //水平角
-        omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
         //垂直角
+        omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
+        //水平角
         alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
         if (deepth < config_.min_range)
         {
@@ -353,6 +299,7 @@ namespace ole_rawdata
           y = deepth * cos_rot_table_[omega] * cos_rot_table_[alpha] - TABLE_COMP[ch][2] * sin_rot_table_[alpha];
           z = deepth * sin_rot_table_[omega] + TABLE_COMP[ch][3];
         }
+        
 
         /** Use standard ROS coordinate system (right-hand rule) */
         //float x_coord = y;

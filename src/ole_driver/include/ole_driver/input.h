@@ -1,5 +1,3 @@
-
-
 #ifndef ole_DRIVER_INPUT_H
 #define ole_DRIVER_INPUT_H
 
@@ -26,15 +24,11 @@ public:
   virtual ~Input() {}
 
   /** @brief Read one ole packet.
-   *
-   * @param pkt points to olePacket message
-   *
    * @returns 0 if successful,
    *          -1 if end of file
    *          > 0 if incomplete packet (is this possible?)
    */
-  virtual int getPacket(ole_msgs::olePacket *pkt,
-                        const double time_offset) = 0;
+  virtual int getPacket(ole_msgs::olePacket *pkt,const double time_offset) = 0;
 
 protected:
   ros::NodeHandle private_nh_;
@@ -47,12 +41,10 @@ protected:
 class InputSocket: public Input
 {
 public:
-  InputSocket(ros::NodeHandle private_nh,
-              uint16_t port = DATA_PORT_NUMBER);
+  InputSocket(ros::NodeHandle private_nh, uint16_t port = DATA_PORT_NUMBER);
   virtual ~InputSocket();
 
-  virtual int getPacket(ole_msgs::olePacket *pkt,
-                        const double time_offset);
+  virtual int getPacket(ole_msgs::olePacket *pkt, const double time_offset);
   void setDeviceIP(const std::string& ip);
 
 private:
@@ -78,8 +70,7 @@ public:
             double repeat_delay = 0.0);
   virtual ~InputPCAP();
 
-  virtual int getPacket(ole_msgs::olePacket *pkt,
-                        const double time_offset);
+  virtual int getPacket(ole_msgs::olePacket *pkt, const double time_offset);
   void setDeviceIP(const std::string& ip);
 
 private:

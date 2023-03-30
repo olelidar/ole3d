@@ -45,11 +45,13 @@ namespace ole_pointcloud
   void OrganizedCloudXYZIR::addPoint(float x, float y, float z,
       const uint16_t ring, const uint16_t /*azimuth*/, const float distance, const float intensity)
   {
-    /** The laser values are not ordered, the organized structure
+    /** 
+     *激光值不是有序的，组织结构需要有序的相邻点。正确的顺序由laser_ring定义。
+	 *为了保持正确的顺序，过滤后的值被设置为NaN。
+	 * The laser values are not ordered, the organized structure
      * needs ordered neighbour points. The right order is defined
      * by the laser_ring value.
-     * To keep the right ordering, the filtered values are set to
-     * NaN.
+     * To keep the right ordering, the filtered values are set to NaN.
      */
     if (pointInRange(distance))
     {
