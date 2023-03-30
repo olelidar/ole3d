@@ -45,7 +45,6 @@ namespace ole_pointcloud
  * Correction values for a single laser (as provided by db.xml from
  * ole).  Includes parameters for ole HDL-64E S2.1.
  *
- * http://olelidar.com/lidar/products/manual/63-HDL64E%20S2%20Manual_Rev%20D_2011_web.pdf
  */
 
 /** \brief Correction information for a single laser. */

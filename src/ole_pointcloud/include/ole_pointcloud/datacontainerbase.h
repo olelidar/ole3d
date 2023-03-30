@@ -52,6 +52,7 @@ public:
     : config_(max_range, min_range, target_frame, fixed_frame, init_width, init_height, is_dense, scans_per_packet)
     , tf_ptr(tf_ptr)
   {
+    // cloud init
     va_list vl;
     cloud.fields.clear();
     cloud.fields.reserve(fields);
@@ -68,6 +69,27 @@ public:
     va_end(vl);
     cloud.point_step = offset;
     cloud.row_step = init_width * cloud.point_step;
+
+    // cloud2 init
+    va_list vl2;
+    cloud2.fields.clear();
+    cloud2.fields.reserve(fields);
+    va_start(vl2, fields);
+    int offset2 = 0;
+    for (int i = 0; i < fields; ++i)
+    {
+      // Create the corresponding PointField
+      std::string name(va_arg(vl2, char*));
+      int count(va_arg(vl2, int));
+      int datatype(va_arg(vl2, int));
+      offset2 = addPointField(cloud2, name, count, datatype, offset2);
+    }
+    va_end(vl2);
+
+    cloud2.point_step = offset2;
+    cloud2.row_step = init_width * cloud2.point_step;
+
+    // tf init
     if (config_.transform && !tf_ptr)
     {
       tf_ptr = boost::shared_ptr<tf::TransformListener>(new tf::TransformListener);
@@ -119,16 +141,48 @@ public:
 
   const sensor_msgs::PointCloud2& finishCloud()
   {
-    cloud.data.resize(cloud.point_step * cloud.width * cloud.height);
+    uint32_t pt_size = cloud.point_step;
+
+    uint32_t data_size = cloud.point_step * cloud.width * cloud.height;
+    cloud.data.resize(data_size);
+
+    // here need matrix transposition
+    cloud2.header = cloud.header;
+    cloud2.width = cloud.height;
+    cloud2.height = cloud.width;
+    // cloud2.point_step =cloud.point_step;
+    cloud2.row_step = cloud2.width * pt_size;
+    cloud2.is_dense = cloud.is_dense;
+
+    cloud2.data.resize(data_size);
+
+    if (data_size) {
+       // column-major to row-major conversion
+
+      for (int j = 0; j < cloud.height; ++j){
+         for (int i = 0; i < cloud.width; ++i) {
+            std::memcpy(&cloud2.data[(i * cloud2.width +j) * pt_size],
+                &cloud.data[(i + j * cloud.width) * pt_size] ,
+                pt_size);
+      }
+     }
+
+     }
+
 
     if (!config_.target_frame.empty())
     {
+      cloud2.header.frame_id = config_.target_frame;
       cloud.header.frame_id = config_.target_frame;
     }
 
     ROS_DEBUG_STREAM("Prepared cloud width" << cloud.height * cloud.width
                                             << " ole points, time: " << cloud.header.stamp);
-    return cloud;
+
+    if(cloud.height == 1)
+      return cloud;
+
+    return cloud2;
   }
 
   void configure(const double max_range, const double min_range, const std::string fixed_frame,
@@ -147,6 +201,7 @@ public:
   }
 
   sensor_msgs::PointCloud2 cloud;
+  sensor_msgs::PointCloud2 cloud2;
 
   inline void vectorTfToEigen(tf::Vector3& tf_vec, Eigen::Vector3f& eigen_vec)
   {

@@ -174,7 +174,7 @@ void oleLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     scan->angle_increment = RESOLUTION;
     scan->angle_min = -M_PI;
     scan->angle_max = M_PI;
-    scan->range_min = 0.0;
+    scan->range_min = 0.01;
     scan->range_max = 200.0;
     scan->time_increment = 0.0;
     scan->ranges.resize(SIZE, INFINITY);

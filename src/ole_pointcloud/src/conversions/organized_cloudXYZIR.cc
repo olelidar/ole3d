@@ -53,8 +53,7 @@ namespace ole_pointcloud
      */
     if (pointInRange(distance))
     {
-      if(config_.transform)
-        transformPoint(x, y, z);
+      if(config_.transform) transformPoint(x, y, z);
 
       *(iter_x+ring) = x;
       *(iter_y+ring) = y;
