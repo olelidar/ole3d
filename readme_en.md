@@ -1,18 +1,18 @@
 ## LR-16F ROS Drive and PointCloud2  ##
 
-### Version:1.0.6 ###
-### Update Time:2020-12-01 ###
+### Version:1.0.7 ###
+### Update Time:2021-04-27 ###
 
 #### build ####
 1. make catkin workspace at your ros machine.
 
     > mkdir -p catkin_ws/src
 
-2. get velodyne.tar.gz from vendor tech support
+2. get ole3d.tar.gz from vendor tech support
 
 3. unzip  zipfile at catkin_ws/src
 
-    >tar zxvf velodyne.tar.gz
+    >tar zxvf ole3d.tar.gz
 
 4. install depend
 

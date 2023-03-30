@@ -1,49 +1,3 @@
-// Copyright (C) 2007, 2009, 2010, 2015 Austin Robot Technology, Patrick Beeson, Jack O'Quin
-// All rights reserved.
-//
-// Software License Agreement (BSD License 2.0)
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//  * Neither the name of {copyright_holder} nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-
-/** \file
- *
- *  Input classes for the ole HDL-64E 3D LIDAR:
- *
- *     Input -- base class used to access the data independently of
- *              its source
- *
- *     InputSocket -- derived class reads live data from the device
- *              via a UDP socket
- *
- *     InputPCAP -- derived class provides a similar interface from a
- *              PCAP dump
- */
-
 #include <unistd.h>
 #include <string>
 #include <sstream>
@@ -80,15 +34,6 @@ namespace ole_driver
                       << devip_str_);
   }
 
-  ////////////////////////////////////////////////////////////////////////
-  // InputSocket class implementation
-  ////////////////////////////////////////////////////////////////////////
-
-  /** @brief constructor
-   *
-   *  @param private_nh ROS private handle for calling node.
-   *  @param port UDP port number
-   */
   InputSocket::InputSocket(ros::NodeHandle private_nh, uint16_t port) : Input(private_nh, port)
   {
     sockfd_ = -1;
@@ -100,7 +45,7 @@ namespace ole_driver
 
     // connect to ole UDP port
     ROS_INFO_STREAM("Opening UDP socket: port " << port);
-    ROS_INFO_STREAM("Version:1.0.6");
+    ROS_INFO_STREAM("Version:1.0.7");
     sockfd_ = socket(PF_INET, SOCK_DGRAM, 0);
     if (sockfd_ == -1)
     {

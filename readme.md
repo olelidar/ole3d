@@ -1,7 +1,7 @@
 ## 欧镭LR-16F雷达ROS驱动  ##
 
-### Version:1.0.6 ###
-### Update Time:2020-12-01 ###
+### Version:1.0.7 ###
+### Update Time:2021-04-27 ###
 
 ### 更新内容 ###
 
@@ -19,9 +19,9 @@
 
     > mkdir -p ole3d_ws/src
 
-2. 解压 'src' ROS驱动文件夹到ole2d_ws
+2. 解压 'src' ROS驱动文件夹到ole3d_ws
 
-    >cp src ole2d_ws
+    >cp src ole3d_ws
 
 3. 安装 depend
 

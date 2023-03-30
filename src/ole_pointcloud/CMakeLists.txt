@@ -80,7 +80,3 @@ install(PROGRAMS scripts/gen_calibration.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 roslint_cpp()
-
-if (CATKIN_ENABLE_TESTING)
-  add_subdirectory(tests)
-endif()

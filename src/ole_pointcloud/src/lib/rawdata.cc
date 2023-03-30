@@ -79,8 +79,8 @@ namespace ole_rawdata
   {
     if (calibration_.num_lasers == 16)
     {
-      return BLOCKS_PER_PACKET * VLP16_FIRINGS_PER_BLOCK *
-             VLP16_SCANS_PER_FIRING;
+      return BLOCKS_PER_PACKET * LR16F_FIRINGS_PER_BLOCK *
+             LR16F_SCANS_PER_FIRING;
     }
     else
     {
@@ -294,7 +294,7 @@ namespace ole_rawdata
         //水平角
         omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
         //垂直角
-        alpha = ((int)(azimuth + TABLE_COMP[ch][1])+ 9000) % 36000;
+        alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
 
         if (deepth < config_.min_range)
         {
@@ -338,7 +338,7 @@ namespace ole_rawdata
         //水平角
         omega = ((int)(TABLE_COMP[ch][0] + 36000)) % 36000;
         //垂直角
-        alpha = ((int)(azimuth + TABLE_COMP[ch][1])+ 9000) % 36000;
+        alpha = ((int)(azimuth + TABLE_COMP[ch][1])) % 36000;
         if (deepth < config_.min_range)
         {
           x = NAN;
